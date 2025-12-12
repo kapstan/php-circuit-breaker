@@ -97,9 +97,8 @@ final class Circuit_Breaker {
 	/**
 	 * Execute a callable with circuit breaker protection
 	 *
-	 * @template T
-	 * @param callable(): T      $operation The operation to execute
-	 * @param callable(): T|null $fallback  Optional fallback when circuit is open
+	 * @param callable  $operation() The operation to execute
+	 * @param ?callable $fallback () Optional fallback when circuit is open
 	 *
 	 * @return mixed
 	 * @throws Throwable When circuit is open and no fallback provided
@@ -172,7 +171,7 @@ final class Circuit_Breaker {
 
 		// Log state transitions for monitoring
 		error_log( sprintf(
-			'[CircuitBreaker] %s: %s -> %s',
+			'[Circuit_Breaker] %s: %s -> %s',
 			$this->service_name,
 			$old_state->value,
 			$new_state->value

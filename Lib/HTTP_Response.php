@@ -23,9 +23,9 @@ readonly class Http_Response {
 		public array $data,
 		public int $status_code,
 		public bool $has_hateoas = false,
-		public array $links = [],
-		public array $embedded = [],
-		public array $headers = [],
+		public array $links      = [],
+		public array $embedded   = [],
+		public array $headers    = [],
 	) {}
 
 	/**
@@ -87,7 +87,7 @@ readonly class Http_Response {
 	 * require HATEOAS fields, but extracts them when they exist.
 	 *
 	 * @param string $json
-	 * @param int    $statusCode
+	 * @param int    $status_code
 	 * @param array  $headers
 	 *
 	 * @return Http_Response
@@ -95,19 +95,19 @@ readonly class Http_Response {
 	 */
 	public static function from_json(
 		string $json,
-		int $statusCode,
+		int $status_code,
 		array $headers = []
 	): self {
 		$decoded = json_decode( $json, true, 512, JSON_THROW_ON_ERROR );
 
 		// Check if this looks like a HATEOAS response
 		// We only consider it HATEOAS if _links exists and contains data
-		$hasHateoas = isset( $decoded[ '_links' ] ) && is_array( $decoded[ '_links' ] );
+		$has_hateoas = isset( $decoded[ '_links' ] ) && is_array( $decoded[ '_links' ] );
 
 		$links    = [];
 		$embedded = [];
 
-		if ( $hasHateoas ) {
+		if ( $has_hateoas ) {
 			// Extract HATEOAS metadata
 			$links = $decoded[ '_links' ];
 			unset( $decoded[ '_links' ] );
@@ -121,8 +121,8 @@ readonly class Http_Response {
 
 		return new self(
 			data: $decoded,
-			status_code: $statusCode,
-			has_hateoas: $hasHateoas,
+			status_code: $status_code,
+			has_hateoas: $has_hateoas,
 			links: $links,
 			embedded: $embedded,
 			headers: $headers,
@@ -138,6 +138,7 @@ readonly class Http_Response {
 	 */
 	public function get_header( string $name ): ?string {
 		$name = strtolower( $name );
+
 		foreach ( $this->headers as $key => $value ) {
 			if ( strtolower( $key ) === $name ) {
 				return $value;
@@ -147,6 +148,9 @@ readonly class Http_Response {
 		return null;
 	}
 
+	/**
+	 * @return string
+	 */
 	public function __toString(): string {
 		return json_encode( $this );
 	}

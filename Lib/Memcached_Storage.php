@@ -73,8 +73,7 @@ class Memcached_Storage implements Circuit_Breaker_Storage_Interface {
 	 *
 	 * @return void
 	 */
-	private function initialize_connection(): void
-	{
+	private function initialize_connection(): void {
 		// Use persistent connections to reuse TCP connections across requests.
 		// The persistent_id groups connections into pools - all instances with
 		// the same ID share connections. This dramatically reduces overhead.
@@ -85,13 +84,13 @@ class Memcached_Storage implements Circuit_Breaker_Storage_Interface {
 		// multiple times causes warnings and connection issues.
 		$servers = $this->memcached->getServerList();
 
-		if (empty($servers)) {
+		if ( empty( $servers ) ) {
 			// First time using this persistent connection - add our server
 			$success = $this->memcached->addServer( $this->host, $this->port );
 
 			if ( ! $success ) {
 				error_log(
-					"[Circuit Breaker] Failed to add Memcached server $this->host:$this->port"
+					"[Circuit_Breaker] Failed to add Memcached server $this->host:$this->port"
 				);
 
 				return;
@@ -127,8 +126,7 @@ class Memcached_Storage implements Circuit_Breaker_Storage_Interface {
 	 *
 	 * @return void
 	 */
-	private function configure_memcached_options(): void
-	{
+	private function configure_memcached_options(): void {
 		$this->memcached->setOptions( [
 			// Binary protocol is more efficient and supports additional features
 			// like CAS (Compare-And-Swap/Check-and-Set) operations for atomic updates
@@ -197,8 +195,7 @@ class Memcached_Storage implements Circuit_Breaker_Storage_Interface {
 	 *
 	 * @return Circuit_State        The current state, defaults to CLOSED if not set
 	 */
-	public function get_state( string $service_name ): Circuit_State
-	{
+	public function get_state( string $service_name ): Circuit_State {
 		if ( ! $this->connected ) {
 			// If Memcached is unavailable, default to CLOSED state
 			// This ensures the circuit breaker doesn't block all traffic
@@ -216,7 +213,7 @@ class Memcached_Storage implements Circuit_Breaker_Storage_Interface {
 
 			if ( $resultCode !== Memcached::RES_NOTFOUND && $resultCode !== Memcached::RES_SUCCESS ) {
 				error_log(
-					"[Circuit Breaker] Memcached error getting state for $service_name: " .
+					"[Circuit_Breaker] Memcached error getting state for $service_name: " .
 					$this->memcached->getResultMessage()
 				);
 			}
@@ -253,7 +250,7 @@ class Memcached_Storage implements Circuit_Breaker_Storage_Interface {
 
 		if (!$success) {
 			error_log(
-				"[Circuit Breaker] Failed to set state for $service_name: " .
+				"[Circuit_Breaker] Failed to set state for $service_name: " .
 				$this->memcached->getResultMessage()
 			);
 		}
@@ -306,14 +303,14 @@ class Memcached_Storage implements Circuit_Breaker_Storage_Interface {
 			$added = $this->memcached->add( $key, 1, $window_seconds );
 
 			if ( ! $added ) {
-				$resultCode = $this->memcached->getResultCode();
+				$result_code = $this->memcached->getResultCode();
 
-				if ( $resultCode === Memcached::RES_NOTSTORED ) {
+				if ( Memcached::RES_NOTSTORED === $result_code ) {
 					// Another server already initialized it - try incrementing again
 					$this->memcached->increment( $key );
 				} else {
 					error_log(
-						"[Circuit Breaker] Failed to initialize failure count for $service_name: " .
+						"[Circuit_Breaker] Failed to initialize failure count for $service_name: " .
 						$this->memcached->getResultMessage()
 					);
 				}
@@ -367,7 +364,7 @@ class Memcached_Storage implements Circuit_Breaker_Storage_Interface {
 			// Success counts are temporary and only relevant during recovery
 			$added = $this->memcached->add( $key, 1, 300 );
 
-			if ( ! $added && $this->memcached->getResultCode() === Memcached::RES_NOTSTORED ) {
+			if ( ! $added && Memcached::RES_NOTSTORED === $this->memcached->getResultCode() ) {
 				// Race condition - another server initialized it
 				$this->memcached->increment( $key );
 			}
@@ -405,10 +402,9 @@ class Memcached_Storage implements Circuit_Breaker_Storage_Interface {
 	 * from OPEN to HALF_OPEN state.
 	 *
 	 * @param string $service_name The service identifier
-	 * @return int|null Unix timestamp, or null if not set
+	 * @return int|null            Unix timestamp, or null if not set
 	 */
-	public function get_opened_at( string $service_name ): ?int
-	{
+	public function get_opened_at( string $service_name ): ?int {
 		if ( ! $this->connected ) {
 			return null;
 		}
@@ -432,8 +428,7 @@ class Memcached_Storage implements Circuit_Breaker_Storage_Interface {
 	 *
 	 * @return void
 	 */
-	public function set_opened_at( string $service_name, int $timestamp, int $ttl_seconds ): void
-	{
+	public function set_opened_at( string $service_name, int $timestamp, int $ttl_seconds ): void {
 		if ( ! $this->connected ) {
 			return;
 		}
@@ -444,7 +439,7 @@ class Memcached_Storage implements Circuit_Breaker_Storage_Interface {
 
 		if (!$success) {
 			error_log(
-				"[Circuit Breaker] Failed to set opened_at for $service_name: " .
+				"[Circuit_Breaker] Failed to set opened_at for $service_name: " .
 				$this->memcached->getResultMessage()
 			);
 		}

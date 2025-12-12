@@ -12,7 +12,7 @@ use Lib\Circuit_Breaker;
 /**
  * Resilient HTTP client with circuit breaker protection
  *
- * This client is format-agnostic: it works with HATEOAS APIs, plain REST APIs,
+ * This client is format-agnostic: it should work with HATEOAS APIs, plain REST APIs,
  * and everything in between. The response parsing automatically detects and
  * extracts HATEOAS metadata when present.
  */
@@ -185,7 +185,6 @@ final class Circuit_Breaker_Client
 		$header_size = curl_getinfo( $ch, CURLINFO_HEADER_SIZE );
 		$error       = curl_error( $ch );
 		$errno       = curl_errno( $ch );
-		// curl_close( $ch );
 
 		// Handle connection errors (timeout, DNS failure, etc.)
 		if ( 0 !== $errno ) {
@@ -292,15 +291,15 @@ final class Circuit_Breaker_Client
 
 		// Fall back to generic messages
 		return match ( $status_code ) {
-			400 => 'Bad Request - Invalid request syntax',
-			401 => 'Unauthorized - Authentication required',
-			403 => 'Forbidden - Access denied',
-			404 => 'Not Found - Resource does not exist',
-			429 => 'Too Many Requests - Rate limit exceeded',
-			500 => 'Internal Server Error',
-			502 => 'Bad Gateway - Invalid upstream response',
-			503 => 'Service Unavailable',
-			504 => 'Gateway Timeout',
+			400     => 'Bad Request - Invalid request syntax',
+			401     => 'Unauthorized - Authentication required',
+			403     => 'Forbidden - Access denied',
+			404     => 'Not Found - Resource does not exist',
+			429     => 'Too Many Requests - Rate limit exceeded',
+			500     => 'Internal Server Error',
+			502     => 'Bad Gateway - Invalid upstream response',
+			503     => 'Service Unavailable',
+			504     => 'Gateway Timeout',
 			default => "HTTP error $status_code",
 		};
 	}

@@ -10,19 +10,18 @@ use RuntimeException;
  * Using a Result type instead of exceptions for recoverable errors
  * makes error handling more explicit and type-safe.
  */
-readonly class HTTP_Result
-{
+readonly class HTTP_Result {
 	/**
 	 * @param bool               $success
 	 * @param Http_Response|null $response
 	 * @param string|null        $error
-	 * @param int|null           $statusCode
+	 * @param int|null           $status_code
 	 */
 	private function __construct(
 		public bool $success,
 		public ?Http_Response $response,
 		public ?string $error,
-		public ?int $statusCode,
+		public ?int $status_code,
 	) {}
 
 	/**
@@ -55,7 +54,7 @@ readonly class HTTP_Result
 		if ( ! $this->success ) {
 			throw new RuntimeException(
 				$this->error ?? 'HTTP request failed',
-				$this->statusCode ?? 0
+				$this->status_code ?? 0
 			);
 		}
 		return $this->response;

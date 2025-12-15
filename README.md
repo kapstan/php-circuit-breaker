@@ -4,10 +4,10 @@ A circuit breaker implementation targeting PHP 8.4+ that prevents cascading fail
 
 ## Features
 
-- ✅ **PHP 8.4 strict types** - Full type safety with enums and readonly classes
-- ✅ **Flexible storage** - Memcached (distributed) storage is provided, but APCu, Redis, etc can be used.
-- ✅ **HATEOAS support** - Auto-detects hypermedia links when present
-- ✅ **Graceful degradation** - Continues operating if cache backend fails
+- **PHP 8.4 strict types** - Full type safety with enums and readonly classes
+- **Flexible storage** - Memcached (distributed) storage is provided, but APCu, Redis, etc can be used.
+- **HATEOAS support** - Auto-detects hypermedia links when present
+- **Graceful degradation** - Continues operating if cache backend fails
 
 ## Quick Start
 A test of the Circuit_Breaker_Client is found in circuit-breaker.php and can be run by executing ```php circuit-breaker.php```
